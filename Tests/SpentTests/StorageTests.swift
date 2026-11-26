@@ -18,3 +18,12 @@ struct StorageTests {
         #expect(back.first?.e == 70)
     }
 }
+
+struct BrowserProbeTests {
+    @Test func extractsDomain() {
+        #expect(BrowserProbe.domain(of: "https://www.github.com/a/b?x=1") == "github.com")
+        #expect(BrowserProbe.domain(of: "http://localhost:3000/") == "localhost:3000")
+        #expect(BrowserProbe.domain(of: "chrome://newtab/") == "newtab")
+        #expect(BrowserProbe.domain(of: "") == "")
+    }
+}
