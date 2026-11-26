@@ -22,8 +22,18 @@ if [ -x "$(command -v iconutil)" ]; then
   iconutil -c icns "$ICONSET" -o "$APP/Contents/Resources/AppIcon.icns"
 fi
 
-# Ad-hoc signature so macOS keeps permissions (Automation, Notifications) stable
-codesign --force --deep --sign - --identifier com.spent.app "$APP"
+# Sign with the local "Spent Local Signing" certificate when it exists: macOS then ties
+# permissions (Full Disk Access, Automation, Notifications) to the certificate, so they survive
+# rebuilds. Without it, fall back to ad-hoc signing (permissions reset on every rebuild).
+# Create the certificate once with: scripts/make-signing-cert.sh
+IDENTITY=$(security find-identity 2>/dev/null | awk -F'"' '/"Spent Local Signing"/ {print $0; exit}' | awk '{print $2}')
+if [ -n "$IDENTITY" ]; then
+  codesign --force --deep --sign "$IDENTITY" --identifier com.spent.app "$APP"
+  echo "Signed with Spent Local Signing"
+else
+  codesign --force --deep --sign - --identifier com.spent.app "$APP"
+  echo "Signed ad-hoc (run scripts/make-signing-cert.sh to keep permissions across rebuilds)"
+fi
 echo "Built $APP"
 
 if [ "${1:-}" = "--install" ]; then
