@@ -1,7 +1,7 @@
 import Foundation
 
 enum Tab: String, CaseIterable, Identifiable {
-    case overview, insights, focus, habits, campaigns, limits, settings
+    case overview, insights, focus, habits, campaigns, deskbreak, aadat, limits, settings
     var id: String { rawValue }
     var title: String {
         switch self {
@@ -10,11 +10,19 @@ enum Tab: String, CaseIterable, Identifiable {
         case .focus: return "Focus"
         case .habits: return "Habits"
         case .campaigns: return "Campaigns"
+        case .deskbreak: return "DeskBreak"
+        case .aadat: return "Aadat · Tasks"
         case .limits: return "Limits & alerts"
         case .settings: return "Settings"
         }
     }
-    var navTitle: String { self == .limits ? "Limits" : title }
+    var navTitle: String {
+        switch self {
+        case .limits: return "Limits"
+        case .aadat: return "Aadat"
+        default: return title
+        }
+    }
     var symbol: String {
         switch self {
         case .overview: return "square.grid.2x2"
@@ -22,6 +30,8 @@ enum Tab: String, CaseIterable, Identifiable {
         case .focus: return "scope"
         case .habits: return "checkmark.square"
         case .campaigns: return "flag"
+        case .deskbreak: return "drop"
+        case .aadat: return "checklist"
         case .limits: return "bell"
         case .settings: return "gearshape"
         }

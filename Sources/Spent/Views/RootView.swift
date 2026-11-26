@@ -60,6 +60,8 @@ struct RootView: View {
         case .focus: FocusPage()
         case .habits: HabitsPage()
         case .campaigns: CampaignsPage()
+        case .deskbreak: DeskBreakPage()
+        case .aadat: AadatPage()
         case .limits: LimitsPage()
         case .settings: SettingsPage()
         }
