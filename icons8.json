@@ -1,0 +1,143 @@
+{
+  "version": 2,
+  "icons": {
+    "pack": "ios7",
+    "filledPack": "ios_filled",
+    "sizes": [
+      16,
+      18,
+      20,
+      24
+    ],
+    "color": "template (tinted by the theme)",
+    "license": "Icons8 free icons: attribution 'Icons by Icons8' shown in Settings",
+    "items": {
+      "overview": {
+        "id": "2692",
+        "pack": "ios7"
+      },
+      "overview-filled": {
+        "id": "8318",
+        "pack": "ios_filled"
+      },
+      "insights": {
+        "id": "375",
+        "pack": "ios7"
+      },
+      "insights-filled": {
+        "id": "8309",
+        "pack": "ios_filled"
+      },
+      "focus": {
+        "id": "20884",
+        "pack": "ios7"
+      },
+      "focus-filled": {
+        "id": "20891",
+        "pack": "ios_filled"
+      },
+      "habits": {
+        "id": "25534",
+        "pack": "ios7"
+      },
+      "habits-filled": {
+        "id": "40902",
+        "pack": "ios_filled"
+      },
+      "campaigns": {
+        "id": "2754",
+        "pack": "ios7"
+      },
+      "campaigns-filled": {
+        "id": "2755",
+        "pack": "ios_filled"
+      },
+      "deskbreak": {
+        "id": "1946",
+        "pack": "ios7"
+      },
+      "deskbreak-filled": {
+        "id": "9021",
+        "pack": "ios_filled"
+      },
+      "aadat": {
+        "id": "4023",
+        "pack": "ios7"
+      },
+      "aadat-filled": {
+        "id": "11266",
+        "pack": "ios_filled"
+      },
+      "limits": {
+        "id": "11642",
+        "pack": "ios7"
+      },
+      "limits-filled": {
+        "id": "11668",
+        "pack": "ios_filled"
+      },
+      "settings": {
+        "id": "364",
+        "pack": "ios7"
+      },
+      "settings-filled": {
+        "id": "2969",
+        "pack": "ios_filled"
+      },
+      "clock": {
+        "id": "34",
+        "pack": "ios7"
+      },
+      "walk": {
+        "id": "2244",
+        "pack": "ios7"
+      },
+      "laptop": {
+        "id": "2884",
+        "pack": "ios7"
+      },
+      "iphone": {
+        "id": "61197",
+        "pack": "ios7"
+      },
+      "moon": {
+        "id": "25031",
+        "pack": "ios7"
+      },
+      "pause": {
+        "id": "403",
+        "pack": "ios7"
+      },
+      "play": {
+        "id": "398",
+        "pack": "ios7"
+      },
+      "back": {
+        "id": "1806",
+        "pack": "ios7"
+      },
+      "forward": {
+        "id": "61",
+        "pack": "ios7"
+      },
+      "close": {
+        "id": "46",
+        "pack": "ios7"
+      },
+      "check": {
+        "id": "3061",
+        "pack": "ios7"
+      }
+    }
+  },
+  "appIcon": {
+    "glyph": {
+      "id": "34",
+      "commonName": "clock",
+      "pack": "ios7",
+      "file": "Resources/AppIconGlyph.png",
+      "size": 512,
+      "color": "ffffff"
+    }
+  }
+}
