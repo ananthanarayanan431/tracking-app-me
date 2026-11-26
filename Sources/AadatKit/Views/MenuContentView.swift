@@ -2,15 +2,22 @@ import AadatCore
 import SwiftUI
 
 /// The window shown when the menu bar item is clicked.
-struct MenuContentView: View {
+public struct MenuContentView: View {
     @ObservedObject var controller: BoardController
+    /// Inside Spent: no Quit (⌘Q would quit Spent) or open-at-login controls; fills its container.
+    let embedded: Bool
+
+    public init(controller: BoardController, embedded: Bool = false) {
+        self.controller = controller
+        self.embedded = embedded
+    }
     @State private var newTitle = ""
     @State private var addToTomorrow = false
     @State private var showingTomorrow = true
     @State private var showingDeleted = false
     @FocusState private var fieldFocused: Bool
 
-    var body: some View {
+    public var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             header
             addField
@@ -25,15 +32,18 @@ struct MenuContentView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.orange.opacity(0.12)))
             }
-            Divider()
-            footer
+            if !embedded {
+                Divider()
+                footer
+            }
         }
-        .padding(16)
-        .frame(width: 360)
+        .padding(embedded ? 0 : 16)
+        .frame(width: embedded ? nil : 360)
+        .frame(maxWidth: embedded ? .infinity : nil, alignment: .leading)
         .animation(.easeInOut(duration: 0.2), value: controller.board)
         .onAppear {
             controller.checkDay()
-            controller.refreshLoginItemState()
+            if !embedded { controller.refreshLoginItemState() }
             fieldFocused = true
         }
     }

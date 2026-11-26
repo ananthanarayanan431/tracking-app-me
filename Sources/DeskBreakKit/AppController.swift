@@ -9,8 +9,8 @@ import Foundation
 /// state: a reminder becoming due, a response window closing, the pause ending, or the idle
 /// threshold possibly being reached.
 @MainActor
-final class AppController: ObservableObject {
-    enum Activity: Equatable {
+public final class AppController: ObservableObject {
+    public enum Activity: Equatable, Sendable {
         case active
         /// No input for at least the idle threshold.
         case away
@@ -20,19 +20,19 @@ final class AppController: ObservableObject {
 
     // MARK: Published state
 
-    @Published private(set) var settings: ReminderSettings
-    @Published private(set) var schedule: ReminderSchedule
-    @Published private(set) var log: ReminderLog
-    @Published private(set) var pauseUntil: Date?
-    @Published private(set) var activity: Activity = .active
+    @Published public private(set) var settings: ReminderSettings
+    @Published public private(set) var schedule: ReminderSchedule
+    @Published public private(set) var log: ReminderLog
+    @Published public private(set) var pauseUntil: Date?
+    @Published public private(set) var activity: Activity = .active
     @Published private(set) var loginItemState: LoginItem.State = .disabled
-    @Published private(set) var lastError: String?
+    @Published public private(set) var lastError: String?
 
-    var isPaused: Bool { pauseUntil != nil }
+    public var isPaused: Bool { pauseUntil != nil }
 
     // MARK: Tuning
 
-    static let manualPauseLength: TimeInterval = 60 * 60
+    public static let manualPauseLength: TimeInterval = 60 * 60
     private static let logRetention: TimeInterval = 60 * 24 * 60 * 60
     /// How often to check for the user's return while away. Only used while away, not while locked.
     private static let awayPollInterval: TimeInterval = 5
@@ -58,6 +58,13 @@ final class AppController: ObservableObject {
 
     private var isCounting: Bool { activity == .active && pauseUntil == nil }
 
+    /// Inside Spent: use DeskBreak's own preferences domain, so its settings and timers carry over.
+    public static let preferencesDomain = "io.github.ananthanarayanan431.deskbreak"
+
+    public convenience init() {
+        self.init(stateStore: StateStore(defaults: UserDefaults(suiteName: Self.preferencesDomain) ?? .standard))
+    }
+
     init(stateStore: StateStore = StateStore()) {
         self.stateStore = stateStore
         let settings = stateStore.loadSettings()
@@ -81,7 +88,7 @@ final class AppController: ObservableObject {
 
     // MARK: Lifecycle
 
-    func start() {
+    public func start() {
         guard !started else { return }
         started = true
 
@@ -112,7 +119,7 @@ final class AppController: ObservableObject {
     }
 
     /// Credits active time up to now and saves everything. Called on quit.
-    func shutdown() {
+    public func shutdown() {
         accrueActiveTime()
         wakeTask?.cancel()
         wakeTask = nil
@@ -125,19 +132,19 @@ final class AppController: ObservableObject {
 
     // MARK: User actions
 
-    func pause(for length: TimeInterval = AppController.manualPauseLength) {
+    public func pause(for length: TimeInterval = AppController.manualPauseLength) {
         pauseUntil = Date().addingTimeInterval(length)
         Log.scheduler.info("Paused for \(Int(length)) s")
         refresh()
     }
 
-    func resume() {
+    public func resume() {
         pauseUntil = nil
         Log.scheduler.info("Resumed")
         refresh()
     }
 
-    func updateSettings(_ proposed: ReminderSettings) {
+    public func updateSettings(_ proposed: ReminderSettings) {
         let newSettings = proposed.validated()
         guard newSettings != settings else { return }
 
@@ -171,7 +178,7 @@ final class AppController: ObservableObject {
     // MARK: Read-only views for the UI
 
     /// Remaining active seconds for a kind, including time elapsed since the last tick.
-    func remaining(for kind: ReminderKind) -> (regular: TimeInterval, snooze: TimeInterval?) {
+    public func remaining(for kind: ReminderKind) -> (regular: TimeInterval, snooze: TimeInterval?) {
         let uncredited = lastTick.map { DurationText.seconds($0.duration(to: clock.now)) } ?? 0
         let slot = schedule[kind]
         return (
@@ -180,7 +187,7 @@ final class AppController: ObservableObject {
         )
     }
 
-    func todaySummary(now: Date = Date()) -> DailySummary {
+    public func todaySummary(now: Date = Date()) -> DailySummary {
         log.summary(for: now)
     }
 

@@ -2,20 +2,28 @@ import DeskBreakCore
 import SwiftUI
 
 /// The window shown when the menu bar icon is clicked.
-struct MenuContentView: View {
+public struct MenuContentView: View {
     @ObservedObject var controller: AppController
     @State private var showingSettings = false
+    /// Inside Spent: no Quit button or launch-at-login controls, and the view fills its container.
+    let embedded: Bool
 
-    var body: some View {
+    public init(controller: AppController, embedded: Bool = false) {
+        self.controller = controller
+        self.embedded = embedded
+    }
+
+    public var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             if showingSettings {
-                SettingsView(controller: controller) { showingSettings = false }
+                SettingsView(controller: controller, showsLaunchAtLogin: !embedded) { showingSettings = false }
             } else {
                 mainPage
             }
         }
-        .padding(14)
-        .frame(width: 300)
+        .padding(embedded ? 0 : 14)
+        .frame(width: embedded ? nil : 300)
+        .frame(maxWidth: embedded ? .infinity : nil, alignment: .leading)
         .onAppear {
             controller.refreshLoginItemState()
         }
@@ -51,14 +59,16 @@ struct MenuContentView: View {
                     MenuButton("Pause for 1 hour", systemImage: "pause.fill") { controller.pause() }
                 }
                 MenuButton("Settings…", systemImage: "gearshape") { showingSettings = true }
-                MenuButton("Quit DeskBreak", systemImage: "power") { NSApp.terminate(nil) }
+                if !embedded {
+                    MenuButton("Quit DeskBreak", systemImage: "power") { NSApp.terminate(nil) }
+                }
             }
         }
     }
 
     @ViewBuilder
     private var warnings: some View {
-        if controller.loginItemState == .requiresApproval {
+        if !embedded, controller.loginItemState == .requiresApproval {
             WarningView(
                 message: "Launch at login needs your approval in System Settings.",
                 actionTitle: "Open Login Items",

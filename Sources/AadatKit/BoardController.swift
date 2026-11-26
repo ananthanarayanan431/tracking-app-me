@@ -8,10 +8,10 @@ import Foundation
 /// a timer aimed at the next midnight, the system's day-changed and wake notifications,
 /// and a check whenever the window opens or the board is edited.
 @MainActor
-final class BoardController: ObservableObject {
-    @Published private(set) var board: DayBoard
+public final class BoardController: ObservableObject {
+    @Published public private(set) var board: DayBoard
     @Published private(set) var loginItemState: LoginItem.State = .disabled
-    @Published private(set) var lastError: String?
+    @Published public private(set) var lastError: String?
 
     private let store: BoardFileStore?
     /// False when the saved file came from a newer version; we then never overwrite it.
@@ -21,7 +21,7 @@ final class BoardController: ObservableObject {
 
     private var calendar: Calendar { .autoupdatingCurrent }
 
-    init() {
+    public init() {
         let now = Date()
         var store: BoardFileStore?
         var board: DayBoard?
@@ -41,7 +41,7 @@ final class BoardController: ObservableObject {
         if rolled || purged { save() }
     }
 
-    func start() {
+    public func start() {
         refreshLoginItemState()
         let center = NotificationCenter.default
         let workspace = NSWorkspace.shared.notificationCenter
@@ -61,7 +61,7 @@ final class BoardController: ObservableObject {
     // MARK: Day change
 
     /// Rolls the board over if the day has changed, and drops deleted tasks older than 24 hours.
-    func checkDay() {
+    public func checkDay() {
         let now = Date()
         let rolled = board.rollOver(now: now, calendar: calendar)
         if rolled { Log.app.notice("New day; unfinished and tomorrow's tasks moved to today") }
@@ -88,47 +88,47 @@ final class BoardController: ObservableObject {
 
     // MARK: Editing
 
-    func add(_ title: String, to list: DayBoard.List = .today) {
+    public func add(_ title: String, to list: DayBoard.List = .today) {
         edit { $0.add(title, to: list, now: Date()) }
     }
 
-    func toggleDone(_ item: TodoItem) {
+    public func toggleDone(_ item: TodoItem) {
         edit { $0.toggleDone(id: item.id, now: Date()) }
     }
 
-    func pushToTomorrow(_ item: TodoItem) {
+    public func pushToTomorrow(_ item: TodoItem) {
         edit { $0.pushToTomorrow(id: item.id) }
     }
 
-    func moveToToday(_ item: TodoItem) {
+    public func moveToToday(_ item: TodoItem) {
         edit { $0.moveToToday(id: item.id) }
     }
 
-    func rename(_ item: TodoItem, to title: String) {
+    public func rename(_ item: TodoItem, to title: String) {
         edit { $0.rename(id: item.id, to: title) }
     }
 
-    func setNote(_ item: TodoItem, to text: String) {
+    public func setNote(_ item: TodoItem, to text: String) {
         edit { $0.setNote(id: item.id, to: text) }
     }
 
-    func remove(_ item: TodoItem) {
+    public func remove(_ item: TodoItem) {
         edit { $0.remove(id: item.id, now: Date()) }
     }
 
-    func clearDone() {
+    public func clearDone() {
         edit { $0.clearDone(now: Date()) }
     }
 
-    func restore(_ entry: DeletedItem) {
+    public func restore(_ entry: DeletedItem) {
         edit { $0.restore(id: entry.id) }
     }
 
-    func deleteForever(_ entry: DeletedItem) {
+    public func deleteForever(_ entry: DeletedItem) {
         edit { $0.deleteForever(id: entry.id) }
     }
 
-    func emptyDeleted() {
+    public func emptyDeleted() {
         edit { $0.emptyDeleted() }
     }
 

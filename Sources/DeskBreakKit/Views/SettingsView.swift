@@ -2,11 +2,19 @@ import DeskBreakCore
 import SwiftUI
 
 /// In-place settings page inside the menu window. Changes apply immediately.
-struct SettingsView: View {
+public struct SettingsView: View {
     @ObservedObject var controller: AppController
+    /// Hidden inside Spent, which has its own launch-at-login setting.
+    var showsLaunchAtLogin = true
     let onDone: () -> Void
 
-    var body: some View {
+    public init(controller: AppController, showsLaunchAtLogin: Bool = true, onDone: @escaping () -> Void) {
+        self.controller = controller
+        self.showsLaunchAtLogin = showsLaunchAtLogin
+        self.onDone = onDone
+    }
+
+    public var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Button(action: onDone) {
@@ -28,8 +36,10 @@ struct SettingsView: View {
                 minutesStepper("Away after", \.idleThreshold, range: ReminderSettings.idleThresholdRange, step: 1)
             }
 
-            Toggle("Launch at login", isOn: launchAtLoginBinding)
-                .disabled(controller.loginItemState == .unavailable)
+            if showsLaunchAtLogin {
+                Toggle("Launch at login", isOn: launchAtLoginBinding)
+                    .disabled(controller.loginItemState == .unavailable)
+            }
 
             HStack {
                 Button("Restore defaults") { controller.updateSettings(.default) }
