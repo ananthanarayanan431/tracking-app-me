@@ -56,6 +56,22 @@ enum AppIcon: String, CaseIterable {
     }
 }
 
+extension AppIcon {
+    /// A non-template copy painted in `color`. The menu bar drops SwiftUI colours from template
+    /// images, so a coloured menu bar icon has to be baked like this.
+    func tinted(_ color: NSColor, filled: Bool = false, points: CGFloat = 16) -> NSImage? {
+        guard let base = image(filled: filled, points: points) else { return nil }
+        let out = NSImage(size: base.size, flipped: false) { rect in
+            base.draw(in: rect)
+            color.set()
+            rect.fill(using: .sourceAtop)
+            return true
+        }
+        out.isTemplate = false
+        return out
+    }
+}
+
 /// SwiftUI view for an Icons8 icon; tinted by `.foregroundStyle`.
 struct Icon: View {
     var icon: AppIcon

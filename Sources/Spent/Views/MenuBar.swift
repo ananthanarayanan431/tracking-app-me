@@ -9,7 +9,7 @@ struct MenuBarLabel: View {
         // No TimelineView here: inside a MenuBarExtra label it makes SwiftUI re-render in a
         // tight loop. The label refreshes whenever the model changes (every few seconds).
         HStack(spacing: 4) {
-            Image(systemName: model.focus.running ? "scope" : "clock")
+            Icon(model.focus.running ? .focus : .clock, size: 16)
             Text(title)
         }
         .onAppear {

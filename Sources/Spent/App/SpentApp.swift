@@ -43,9 +43,9 @@ struct SpentApp: App {
             }
         } label: {
             if let c = delegate.model.companions.deskbreak {
-                DeskBreakKit.MenuBarLabel(controller: c)
+                DeskBreakMenuIcon(controller: c)
             } else {
-                Image(systemName: "drop")
+                Icon(.deskbreak, size: 16)
             }
         }
         .menuBarExtraStyle(.window)
@@ -56,9 +56,9 @@ struct SpentApp: App {
             }
         } label: {
             if let c = delegate.model.companions.aadat {
-                AadatKit.MenuBarLabel(controller: c)
+                AadatMenuIcon(controller: c)
             } else {
-                Image(systemName: "checklist")
+                Icon(.aadat, size: 16)
             }
         }
         .menuBarExtraStyle(.window)
@@ -98,5 +98,41 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @MainActor
     func applicationWillTerminate(_ notification: Notification) {
         model.shutdown()
+    }
+}
+
+/// DeskBreak's menu bar icon, drawn with Spent's Icons8 set but keeping DeskBreak's meaning:
+/// a blue filled drop while counting, a moon while away or locked, pause while paused.
+struct DeskBreakMenuIcon: View {
+    @ObservedObject var controller: DeskBreakKit.AppController
+
+    var body: some View {
+        Group {
+            if controller.isPaused {
+                Icon(.pause, size: 16)
+            } else if controller.activity != .active {
+                Icon(.moon, size: 16)
+            } else if let blue = AppIcon.deskbreak.tinted(.systemBlue, filled: true, points: 16) {
+                Image(nsImage: blue)
+            } else {
+                Icon(.deskbreak, filled: true, size: 16)
+            }
+        }
+        .accessibilityLabel(controller.isPaused ? "DeskBreak, paused" : controller.activity == .active ? "DeskBreak" : "DeskBreak, away")
+    }
+}
+
+/// Aadat's menu bar item: the to-do icon (a check once everything is done) and "done/total".
+struct AadatMenuIcon: View {
+    @ObservedObject var controller: AadatKit.BoardController
+
+    var body: some View {
+        let b = controller.board
+        let allDone = b.totalCount > 0 && b.doneCount == b.totalCount
+        HStack(spacing: 3) {
+            Icon(allDone ? .check : .aadat, size: 16)
+            if b.totalCount > 0 { Text("\(b.doneCount)/\(b.totalCount)").monospacedDigit() }
+        }
+        .accessibilityLabel("Aadat, \(b.doneCount) of \(b.totalCount) tasks done today")
     }
 }
