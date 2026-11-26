@@ -46,6 +46,7 @@ final class AppModel {
     var revision = 0
 
     let classifier = Classifier()
+    let companions = Companions()
     let tracker = Tracker()
     @ObservationIgnored var cache = SummaryCache()
     @ObservationIgnored var limitFired: [String: [String: LimitFire]] = [:]
@@ -101,6 +102,8 @@ final class AppModel {
             MainActor.assumeIsolated { self?.handleSample(seg) }
         }
         tracker.start()
+        companions.onMessage = { [weak self] m in self?.toast(m) }
+        companions.start()
         Theme.applyDockIcon(settings: settings)
         if focus.running, Date().timeIntervalSince1970 >= focus.endsAt { focusEnd(done: true) }
         Task { await Notifier.shared.refreshState(); notificationsAllowed = Notifier.shared.allowed }
@@ -116,6 +119,7 @@ final class AppModel {
     }
 
     func shutdown() {
+        companions.shutdown()
         tracker.stop()
         saveCache()
     }
