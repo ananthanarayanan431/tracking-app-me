@@ -134,44 +134,88 @@ private struct PhoneCard: View {
     @Environment(AppModel.self) private var model
     @Environment(\.skin) private var skin
     @State private var path = ""
+    @State private var showShortcuts = false
 
     var body: some View {
         Card {
             CardHeader(title: "iPhone")
-            if model.phone.events > 0, let last = model.phone.last {
-                (Text("● Connected").foregroundStyle(skin.good).bold() + Text(" · \(model.phone.events) events, last \(Date(timeIntervalSince1970: last).formatted(date: .abbreviated, time: .shortened))"))
-                    .font(.system(size: 14))
-            } else {
-                Text("No iPhone log found yet").foregroundStyle(skin.warn).bold().font(.system(size: 14))
-            }
-            VStack(alignment: .leading, spacing: 6) {
-                ForEach(Array([
-                    "On iPhone: Shortcuts › Automation › New Automation › App.",
-                    "Pick an app (say Instagram), tick Is Opened and Is Closed, choose Run Immediately, then New Blank Automation.",
-                    "Add Format Date (Current Date, ISO 8601, include time).",
-                    "Add Text: Formatted Date|Instagram",
-                    "Add Append to Text File → Spent/phone.txt, Make New Line on.",
-                    "Duplicate for each app; change only the app and name.",
-                ].enumerated()), id: \.offset) { i, s in
-                    HStack(alignment: .top, spacing: 8) {
-                        Text("\(i + 1).").foregroundStyle(skin.muted).frame(width: 18, alignment: .trailing)
-                        Text(s)
+            status
+            Note("Spent reads the iPhone app usage that Screen Time syncs to this Mac: every app, automatically, nothing to install on the phone and nothing is blocked. Today’s numbers arrive in batches, so they can lag a few hours behind; past days fill in completely.")
+            switch model.phone.screenTime {
+            case .noAccess:
+                VStack(alignment: .leading, spacing: 6) {
+                    step(1, "Click the button below, then + and choose Spent from your Applications folder.")
+                    step(2, "Turn Spent’s switch on, then quit and reopen Spent.")
+                }
+                HStack {
+                    Button("Open Full Disk Access settings") {
+                        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles")!)
                     }
-                    .font(.system(size: 13))
+                    .spentButton(.accent)
+                    Button("Check again") { model.loadBase() }.spentButton()
                 }
+            case .noDevices:
+                VStack(alignment: .leading, spacing: 6) {
+                    step(1, "iPhone: Settings › Screen Time › turn on Share Across Devices.")
+                    step(2, "Mac: System Settings › Screen Time › turn on Share across devices (same Apple ID).")
+                    step(3, "Wait a while for the first sync, then click Check again.")
+                }
+                Button("Check again") { model.loadBase() }.spentButton()
+            default:
+                EmptyView()
             }
-            HStack {
-                TextField("Custom path to phone.txt (optional)", text: $path).spentField()
-                Button("Save") {
-                    model.phoneCustomPath = path.trimmingCharacters(in: .whitespaces)
-                    Storage.writeText("phone-path", model.phoneCustomPath)
-                    model.loadBase()
-                    model.toast(model.phone.events > 0 ? "iPhone log loaded" : "No log found at that path")
+            DisclosureGroup(isExpanded: $showShortcuts) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Note("Optional: a Shortcuts automation per app writes open/close times to iCloud Drive straight away. Spent uses it only for the time after the last Screen Time sync, so nothing is counted twice.")
+                    ForEach(Array([
+                        "On iPhone: Shortcuts › Automation › New Automation › App.",
+                        "Pick an app, tick Is Opened and Is Closed, choose Run Immediately, then New Blank Automation.",
+                        "Add Format Date (Current Date, ISO 8601, include time).",
+                        "Add Text: Formatted Date|AppName",
+                        "Add Append to Text File → Spent/phone.txt, Make New Line on.",
+                    ].enumerated()), id: \.offset) { i, t in step(i + 1, t) }
+                    if model.phone.shortcutEvents > 0 {
+                        Text("Shortcuts log: \(model.phone.shortcutEvents) lines").font(.system(size: 12)).foregroundStyle(skin.good)
+                    }
+                    HStack {
+                        TextField("Custom path to phone.txt (optional)", text: $path).spentField()
+                        Button("Save") {
+                            model.phoneCustomPath = path.trimmingCharacters(in: .whitespaces)
+                            Storage.writeText("phone-path", model.phoneCustomPath)
+                            model.loadBase()
+                        }
+                        .spentButton()
+                    }
                 }
-                .spentButton()
+                .padding(.top, 6)
+            } label: {
+                Text("Same-day top-up with Shortcuts (optional)").font(.system(size: 13, weight: .medium))
             }
         }
         .onAppear { path = model.phoneCustomPath }
+    }
+
+    @ViewBuilder private var status: some View {
+        switch model.phone.screenTime {
+        case .ok(_, let events, let last):
+            (Text("● Connected via Screen Time").foregroundStyle(skin.good).bold()
+                + Text(" · \(events.formatted()) events\(last.map { ", synced up to " + Date(timeIntervalSince1970: $0).formatted(date: .abbreviated, time: .shortened) } ?? "")"))
+                .font(.system(size: 14))
+        case .noAccess:
+            Text("Spent needs Full Disk Access to read iPhone usage").foregroundStyle(skin.warn).bold().font(.system(size: 14))
+        case .noDevices:
+            Text("No iPhone data synced to this Mac yet").foregroundStyle(skin.warn).bold().font(.system(size: 14))
+        case .unreadable(let why):
+            Text("iPhone data couldn’t be read: \(why)").foregroundStyle(skin.bad).bold().font(.system(size: 14))
+        }
+    }
+
+    private func step(_ n: Int, _ text: String) -> some View {
+        HStack(alignment: .top, spacing: 8) {
+            Text("\(n).").foregroundStyle(skin.muted).frame(width: 18, alignment: .trailing)
+            Text(text)
+        }
+        .font(.system(size: 13))
     }
 }
 
@@ -381,8 +425,8 @@ private struct PrivacyCard: View {
                 model.toast("Privacy setting saved")
             })) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Website logos")
-                    Note("Asks Google for a site’s icon once, by domain name. Off = only logos of apps on this Mac")
+                    Text("Website logos and iPhone app names")
+                    Note("Asks Google for a site’s icon, and Apple’s App Store for an iPhone app’s name and icon, once each. Off = only logos of apps on this Mac")
                 }
             }
             .toggleStyle(.switch)
