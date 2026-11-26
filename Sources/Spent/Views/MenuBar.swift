@@ -6,11 +6,11 @@ struct MenuBarLabel: View {
     @Environment(\.openWindow) private var openWindow
 
     var body: some View {
-        TimelineView(.periodic(from: .now, by: 15)) { _ in
-            HStack(spacing: 4) {
-                Image(systemName: model.focus.running ? "scope" : "clock")
-                Text(title)
-            }
+        // No TimelineView here: inside a MenuBarExtra label it makes SwiftUI re-render in a
+        // tight loop. The label refreshes whenever the model changes (every few seconds).
+        HStack(spacing: 4) {
+            Image(systemName: model.focus.running ? "scope" : "clock")
+            Text(title)
         }
         .onAppear {
             // Lets the Dock icon and menu reopen the window after it was closed.
@@ -21,6 +21,7 @@ struct MenuBarLabel: View {
     private var title: String {
         if model.focus.running { return "Focus \(Int(ceil(model.focusRemaining / 60)))m" }
         _ = model.revision
+        _ = model.current
         return Fmt.duration(model.todayAll().t)
     }
 }
