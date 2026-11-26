@@ -1,10 +1,14 @@
 import SwiftUI
 
 /// The menu bar item: a checklist icon and today's "done/total" count.
-struct MenuBarLabel: View {
+public struct MenuBarLabel: View {
     @ObservedObject var controller: BoardController
 
-    var body: some View {
+    public init(controller: BoardController) {
+        self.controller = controller
+    }
+
+    public var body: some View {
         let board = controller.board
         HStack(spacing: 3) {
             Image(systemName: allDone ? "checkmark.circle" : "checklist")

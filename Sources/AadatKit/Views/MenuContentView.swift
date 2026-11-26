@@ -4,12 +4,15 @@ import SwiftUI
 /// The window shown when the menu bar item is clicked.
 public struct MenuContentView: View {
     @ObservedObject var controller: BoardController
-    /// Inside Spent: no Quit (⌘Q would quit Spent) or open-at-login controls; fills its container.
+    /// In a Spent page: the view fills its container instead of the 360 pt menu width.
     let embedded: Bool
+    /// Running inside Spent (page or menu bar): no Quit (⌘Q would quit Spent) or open-at-login controls.
+    let hosted: Bool
 
-    public init(controller: BoardController, embedded: Bool = false) {
+    public init(controller: BoardController, embedded: Bool = false, hostedInSpent: Bool = false) {
         self.controller = controller
         self.embedded = embedded
+        self.hosted = embedded || hostedInSpent
     }
     @State private var newTitle = ""
     @State private var addToTomorrow = false
@@ -32,7 +35,7 @@ public struct MenuContentView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(RoundedRectangle(cornerRadius: 8, style: .continuous).fill(Color.orange.opacity(0.12)))
             }
-            if !embedded {
+            if !hosted {
                 Divider()
                 footer
             }
@@ -43,7 +46,7 @@ public struct MenuContentView: View {
         .animation(.easeInOut(duration: 0.2), value: controller.board)
         .onAppear {
             controller.checkDay()
-            if !embedded { controller.refreshLoginItemState() }
+            if !hosted { controller.refreshLoginItemState() }
             fieldFocused = true
         }
     }

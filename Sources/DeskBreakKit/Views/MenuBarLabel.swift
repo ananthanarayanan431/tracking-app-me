@@ -2,10 +2,14 @@ import AppKit
 import SwiftUI
 
 /// The icon shown in the menu bar.
-struct MenuBarLabel: View {
+public struct MenuBarLabel: View {
     @ObservedObject var controller: AppController
 
-    var body: some View {
+    public init(controller: AppController) {
+        self.controller = controller
+    }
+
+    public var body: some View {
         icon
             .accessibilityLabel(accessibilityText)
     }
