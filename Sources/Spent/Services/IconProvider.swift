@@ -83,6 +83,10 @@ final class IconProvider {
                 save(icon, to: file)
                 return icon
             }
+            if network, let art = PhoneApps.artwork(forName: name), let img = download(art) {
+                save(img, to: file)
+                return img
+            }
             if network, let dom = knownDomains[name] { return favicon(dom, to: file) }
             return nil
         }
@@ -126,6 +130,18 @@ final class IconProvider {
             }
         }
         return nil
+    }
+
+    /// iPhone-only apps: the App Store artwork found when the name was looked up.
+    nonisolated static func download(_ url: URL) -> NSImage? {
+        let sem = DispatchSemaphore(value: 0)
+        var out: NSImage?
+        URLSession.shared.dataTask(with: URLRequest(url: url, timeoutInterval: 8)) { d, r, _ in
+            if (r as? HTTPURLResponse)?.statusCode == 200, let d { out = NSImage(data: d) }
+            sem.signal()
+        }.resume()
+        sem.wait()
+        return out
     }
 
     nonisolated static func save(_ img: NSImage, to file: URL) {

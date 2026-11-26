@@ -92,7 +92,10 @@ final class AppModel {
     func start() {
         // When App Store lookups learn new iPhone app names, re-read so they show up.
         PhoneApps.onLearned = { [weak self] in
-            MainActor.assumeIsolated { self?.scheduleReload() }
+            MainActor.assumeIsolated {
+                IconProvider.shared.retry()
+                self?.scheduleReload()
+            }
         }
         tracker.onSample = { [weak self] seg in
             MainActor.assumeIsolated { self?.handleSample(seg) }
