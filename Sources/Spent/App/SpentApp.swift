@@ -1,4 +1,6 @@
+import AadatKit
 import AppKit
+import DeskBreakKit
 import SwiftUI
 
 @main
@@ -33,6 +35,33 @@ struct SpentApp: App {
         } label: {
             MenuBarLabel(model: delegate.model)
         }
+
+        // DeskBreak and Aadat keep their own menu bar icons and panels while they run inside Spent.
+        MenuBarExtra(isInserted: .constant(delegate.model.companions.deskbreak != nil)) {
+            if let c = delegate.model.companions.deskbreak {
+                DeskBreakKit.MenuContentView(controller: c, hostedInSpent: true)
+            }
+        } label: {
+            if let c = delegate.model.companions.deskbreak {
+                DeskBreakKit.MenuBarLabel(controller: c)
+            } else {
+                Image(systemName: "drop")
+            }
+        }
+        .menuBarExtraStyle(.window)
+
+        MenuBarExtra(isInserted: .constant(delegate.model.companions.aadat != nil)) {
+            if let c = delegate.model.companions.aadat {
+                AadatKit.MenuContentView(controller: c, hostedInSpent: true)
+            }
+        } label: {
+            if let c = delegate.model.companions.aadat {
+                AadatKit.MenuBarLabel(controller: c)
+            } else {
+                Image(systemName: "checklist")
+            }
+        }
+        .menuBarExtraStyle(.window)
     }
 }
 
