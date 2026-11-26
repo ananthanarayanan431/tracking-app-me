@@ -15,7 +15,7 @@ final class IconProvider {
     /// Website icons need the network; Settings › Privacy can switch that off.
     @ObservationIgnored var allowNetwork = true
 
-    static let knownDomains: [String: String] = [
+    nonisolated static let knownDomains: [String: String] = [
         "Instagram": "instagram.com", "YouTube": "youtube.com", "WhatsApp": "whatsapp.com", "X": "x.com", "Twitter": "x.com",
         "Gmail": "mail.google.com", "Spotify": "spotify.com", "Netflix": "netflix.com", "Snapchat": "snapchat.com",
         "Facebook": "facebook.com", "LinkedIn": "linkedin.com", "Reddit": "reddit.com", "Telegram": "telegram.org",
@@ -99,7 +99,7 @@ final class IconProvider {
             let p = "\(dir)/\(name).app"
             if FileManager.default.fileExists(atPath: p) { return p }
         }
-        return NSWorkspace.shared.fullPath(forApplication: name)
+        return nil
     }
 
     nonisolated static func favicon(_ domain: String, to file: URL) -> NSImage? {
