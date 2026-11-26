@@ -54,6 +54,7 @@ final class AppModel {
     @ObservationIgnored var lastNudge: Double = 0
     @ObservationIgnored private var timers: [Timer] = []
     @ObservationIgnored private var toastTask: Task<Void, Never>?
+    @ObservationIgnored private var reloadTask: Task<Void, Never>?
     @ObservationIgnored private var hadCurrent = false
     @ObservationIgnored var todayCache: (key: String, rev: Int, mac: Summary)?
 
@@ -89,6 +90,10 @@ final class AppModel {
     }
 
     func start() {
+        // When App Store lookups learn new iPhone app names, re-read so they show up.
+        PhoneApps.onLearned = { [weak self] in
+            MainActor.assumeIsolated { self?.scheduleReload() }
+        }
         tracker.onSample = { [weak self] seg in
             MainActor.assumeIsolated { self?.handleSample(seg) }
         }
@@ -116,8 +121,17 @@ final class AppModel {
     func loadBase() {
         daysAvail = Storage.availableDays()
         paused = Storage.exists("paused")
-        phone = PhoneImport.load(custom: phoneCustomPath)
+        phone = PhoneImport.loadAll(custom: phoneCustomPath, allowNetwork: settings.privacy.logos)
         revision += 1
+    }
+
+    /// Coalesces bursts of reload requests into one.
+    func scheduleReload() {
+        reloadTask?.cancel()
+        reloadTask = Task {
+            try? await Task.sleep(for: .seconds(1))
+            if !Task.isCancelled { loadBase() }
+        }
     }
 
     private func handleSample(_ seg: Segment?) {

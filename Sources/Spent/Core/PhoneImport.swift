@@ -8,6 +8,37 @@ enum PhoneImport {
         var events = 0
         var last: Double?
         var path = ""
+        /// iPhone usage synced by Screen Time (the main source).
+        var screenTime: BiomeReader.Status = .noAccess
+        var screenTimeLast: Double?
+        /// Lines in the optional Shortcuts log.
+        var shortcutEvents = 0
+    }
+
+    /// Screen Time sync first; the Shortcuts log (if any) only adds what came after the last
+    /// synced record, so the two never double-count.
+    static func loadAll(custom: String, allowNetwork: Bool) -> Result {
+        let (status, events) = BiomeReader.load()
+        let synced = BiomeReader.sessions(events).map { g -> Segment in
+            var g = g
+            g.app = PhoneApps.name(g.app, allowNetwork: allowNetwork)
+            return g
+        }
+        let cutoff = events.map(\.t).max() ?? 0
+        let log = load(custom: custom)
+
+        var r = Result()
+        r.screenTime = status
+        r.screenTimeLast = events.isEmpty ? nil : cutoff
+        r.shortcutEvents = log.events
+        r.path = log.path
+        for g in synced { r.byDay[Fmt.key(epoch: g.s), default: []].append(g) }
+        for (_, segs) in log.byDay {
+            for g in segs where g.s > cutoff { r.byDay[Fmt.key(epoch: g.s), default: []].append(g) }
+        }
+        r.events = events.count + log.events
+        r.last = [cutoff > 0 ? cutoff : nil, log.last].compactMap { $0 }.max()
+        return r
     }
 
     static func candidatePaths(custom: String) -> [String] {
