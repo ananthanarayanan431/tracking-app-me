@@ -31,6 +31,7 @@ final class AppModel {
     var away: [AwayEntry] = []
     var manual: [ManualPhone] = []
     var aiTexts: [String: String] = [:]
+    var aiRunning: Set<String> = []
     var phoneCustomPath = ""
 
     // Live state
