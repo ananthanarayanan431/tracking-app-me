@@ -73,6 +73,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     ///   Spent --enable-login-item / --disable-login-item   (prints the result and exits)
     func applicationWillFinishLaunching(_ notification: Notification) {
         let args = CommandLine.arguments
+        if args.contains("--iphone-report") {
+            IPhoneReport.write()
+            exit(0)
+        }
         guard let flag = args.first(where: { $0 == "--enable-login-item" || $0 == "--disable-login-item" }) else { return }
         let on = flag == "--enable-login-item"
         let err = LoginItem.set(on)
