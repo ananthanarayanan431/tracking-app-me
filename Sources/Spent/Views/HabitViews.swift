@@ -16,7 +16,7 @@ struct CheckButton: View {
                 if let label, !done {
                     Text(label).font(.system(size: 13, weight: .bold)).foregroundStyle(color)
                 } else {
-                    Image(systemName: "checkmark").font(.system(size: 15, weight: .bold))
+                    Icon(.check, size: 18)
                         .foregroundStyle(done ? Color.black.opacity(0.75) : skin.dim)
                 }
             }

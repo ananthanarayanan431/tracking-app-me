@@ -125,7 +125,10 @@ private struct HistoryCard: View {
                 let skipped = all.filter { $0.status == .skipped }.count
                 let missed = all.filter { $0.status == .missed }.count
                 HStack {
-                    Label(kind == .water ? "Water" : "Walk", systemImage: kind == .water ? "drop.fill" : "figure.walk")
+                    HStack(spacing: 6) {
+                        Icon(kind == .water ? .deskbreak : .walk, filled: kind == .water, size: 16)
+                        Text(kind == .water ? "Water" : "Walk")
+                    }
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(kind == .water ? skin.blue : skin.good)
                     Spacer()
@@ -158,7 +161,7 @@ private struct RecentCard: View {
             CardHeader(title: "Recent reminders", sub: "\(records.count) kept (60 days)")
             ForEach(records.sorted { $0.firedAt > $1.firedAt }.prefix(15)) { r in
                 HStack(spacing: 10) {
-                    Image(systemName: r.kind == .water ? "drop.fill" : "figure.walk")
+                    Icon(r.kind == .water ? .deskbreak : .walk, filled: r.kind == .water, size: 16)
                         .foregroundStyle(r.kind == .water ? skin.blue : skin.good).frame(width: 18)
                     Text(r.kind == .water ? "Water" : "Walk").frame(width: 60, alignment: .leading)
                     Text("\(Fmt.shortDate(Fmt.key(r.firedAt))) \(Fmt.clock(r.firedAt.timeIntervalSince1970))")

@@ -112,8 +112,8 @@ private struct HeroCard: View {
                 ScoreRing(value: S.score, size: 112)
             }
             HStack(spacing: 10) {
-                deviceTile("laptopcomputer", Fmt.duration(d.Smac.t), "Mac")
-                deviceTile("iphone", Fmt.duration(d.Sph.t), "iPhone")
+                deviceTile(.laptop, Fmt.duration(d.Smac.t), "Mac")
+                deviceTile(.iphone, Fmt.duration(d.Sph.t), "iPhone")
             }
             KindBar(summary: S)
             HStack(spacing: 10) { ForEach(minis.indices, id: \.self) { i in mini(minis[i]) } }
@@ -132,9 +132,9 @@ private struct HeroCard: View {
                 (S.d.sortedDesc.first?.key ?? "–", "Top site", "site")]
     }
 
-    private func deviceTile(_ symbol: String, _ value: String, _ label: String) -> some View {
+    private func deviceTile(_ icon: AppIcon, _ value: String, _ label: String) -> some View {
         HStack(spacing: 10) {
-            Image(systemName: symbol).font(.system(size: 18)).foregroundStyle(skin.muted).frame(width: 24)
+            Icon(icon, size: 22).foregroundStyle(skin.muted).frame(width: 24)
             VStack(alignment: .leading, spacing: 0) {
                 Text(value).font(.system(size: 16, weight: .semibold))
                 Text(label).font(.system(size: 11)).foregroundStyle(skin.muted)

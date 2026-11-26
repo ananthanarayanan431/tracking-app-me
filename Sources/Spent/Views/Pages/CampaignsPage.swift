@@ -69,7 +69,10 @@ private struct CampaignCard: View {
                 Spacer()
                 if s.state == .active {
                     Button { model.toggleCampaign(c.id, t) } label: {
-                        Label(s.todayDone ? "Done today" : "Put today’s dot", systemImage: s.todayDone ? "checkmark" : "circle")
+                        HStack(spacing: 8) {
+                            if s.todayDone { Icon(.check, size: 16) }
+                            Text(s.todayDone ? "Done today" : "Put today’s dot")
+                        }
                             .font(.system(size: 15, weight: .semibold))
                             .padding(.horizontal, 18).frame(minHeight: 48)
                             .background(s.todayDone ? col : col.opacity(0.15), in: RoundedRectangle(cornerRadius: 14))

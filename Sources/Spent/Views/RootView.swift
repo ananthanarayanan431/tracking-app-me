@@ -101,7 +101,7 @@ struct Sidebar: View {
             ForEach(Tab.allCases) { t in
                 Button { model.tab = t } label: {
                     HStack(spacing: 12) {
-                        Image(systemName: t.symbol).frame(width: 18)
+                        Icon(t.icon, filled: model.tab == t, size: 18)
                         Text(t.navTitle)
                         Spacer()
                         if let n = badge(t), n > 0 {
@@ -143,13 +143,7 @@ struct BrandMark: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: size * 0.28, style: .continuous).fill(skin.acc)
-            Circle().stroke(skin.onAcc, lineWidth: size * 0.086).frame(width: size * 0.54, height: size * 0.54)
-            Path { p in
-                let c = CGPoint(x: size / 2, y: size / 2)
-                p.move(to: c); p.addLine(to: CGPoint(x: c.x, y: c.y - size * 0.16))
-                p.move(to: c); p.addLine(to: CGPoint(x: c.x + size * 0.107, y: c.y + size * 0.071))
-            }
-            .stroke(skin.onAcc, style: StrokeStyle(lineWidth: size * 0.086, lineCap: .round))
+            Icon(.clock, size: size * 0.66).foregroundStyle(skin.onAcc)
         }
         .frame(width: size, height: size)
     }
@@ -214,9 +208,9 @@ struct TopBar: View {
                 Seg(options: PeriodView.allCases.map { ($0, $0.label) }, selection: Binding(
                     get: { model.period }, set: { model.period = $0; model.anchor = Date() }))
                 HStack(spacing: 4) {
-                    Button { model.stepPeriod(-1) } label: { Image(systemName: "chevron.left") }.spentButton(.ghost, compact: true)
+                    Button { model.stepPeriod(-1) } label: { Icon(.back, size: 14) }.spentButton(.ghost, compact: true)
                     Text(model.currentRange.label).font(.system(size: 14, weight: .semibold)).frame(minWidth: 120)
-                    Button { model.stepPeriod(1) } label: { Image(systemName: "chevron.right") }.spentButton(.ghost, compact: true)
+                    Button { model.stepPeriod(1) } label: { Icon(.forward, size: 14) }.spentButton(.ghost, compact: true)
                         .disabled(model.currentRange.end > Date())
                 }
                 deviceSeg

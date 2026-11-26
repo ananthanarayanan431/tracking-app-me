@@ -55,7 +55,7 @@ struct DetailSheet: View {
                             .font(.system(size: 12)).foregroundStyle(skin.muted)
                     }
                     Spacer()
-                    Button { dismiss() } label: { Image(systemName: "xmark") }.spentButton(.ghost, compact: true)
+                    Button { dismiss() } label: { Icon(.close, size: 14) }.spentButton(.ghost, compact: true)
                         .keyboardShortcut(.cancelAction)
                 }
                 StatGrid(items: [(Fmt.duration(tot), "Total"), (Fmt.duration(tot / Double(active)), "Per active day"),
