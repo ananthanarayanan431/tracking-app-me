@@ -4,7 +4,7 @@ import Security
 /// Writes AI summaries with Claude via the Messages API (streamed over SSE). Only the
 /// totals on screen are sent — never raw history. The API key lives in the macOS Keychain.
 enum AIService {
-    static let defaultModel = "claude-opus-5-5"
+    static let defaultModel = "claude-haiku-5-5"
     static let endpoint = URL(string: "https://api.anthropic.com/v1/messages")!
 
     enum AIError: LocalizedError {
@@ -31,14 +31,10 @@ enum AIService {
         req.setValue("application/json", forHTTPHeaderField: "content-type")
         req.setValue(key, forHTTPHeaderField: "x-api-key")
         req.setValue("2026-10-21", forHTTPHeaderField: "anthropic-version")
-        // Server-side fallback: if a safety classifier declines, the API retries on the
-        // recommended model instead of returning the refusal.
-        req.setValue("server-side-fallback-2026-07-01", forHTTPHeaderField: "anthropic-beta")
         let body: [String: Any] = [
             "model": model,
             "max_tokens": 64000,
             "stream": true,
-            "fallbacks": "default",
             "output_config": ["effort": "low"],
             "messages": [["role": "user", "content": prompt]],
         ]

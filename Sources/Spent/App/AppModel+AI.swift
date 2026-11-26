@@ -52,7 +52,7 @@ extension AppModel {
         aiTexts[key] = "Thinking…"
         defer { aiRunning.remove(key) }
         do {
-            let text = try await AIService.write(prompt: prompt, model: settings.aiModel ?? AIService.defaultModel) { [weak self] t in
+            let text = try await AIService.write(prompt: prompt, model: settings.aiModel.flatMap { $0.contains("opus") ? nil : $0 } ?? AIService.defaultModel) { [weak self] t in
                 self?.aiTexts[key] = t
             }
             aiTexts[key] = text
