@@ -20,3 +20,19 @@ struct PeriodTests {
         #expect(r.keys.last == Fmt.todayKey)
     }
 }
+
+struct EditWindowTests {
+    @Test func todayAndPreviousTwoDaysAreEditable() {
+        let t = "2026-03-01"
+        #expect(Fmt.isEditable("2026-03-01", today: t))
+        #expect(Fmt.isEditable("2026-02-28", today: t))
+        #expect(Fmt.isEditable("2026-02-27", today: t))
+    }
+
+    @Test func olderAndFutureDaysAreLocked() {
+        let t = "2026-03-01"
+        #expect(!Fmt.isEditable("2026-02-26", today: t))
+        #expect(!Fmt.isEditable("2025-12-31", today: t))
+        #expect(!Fmt.isEditable("2026-03-02", today: t))
+    }
+}

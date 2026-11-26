@@ -56,7 +56,8 @@ extension AppModel {
     }
 
     func toggleCampaign(_ id: String, _ k: String) {
-        guard let c = settings.campaigns.first(where: { $0.id == id }), k <= Fmt.todayKey else { return }
+        guard let c = settings.campaigns.first(where: { $0.id == id }) else { return }
+        guard Fmt.isEditable(k) else { return lockedToast(k) }
         if clog[id]?[k] != nil {
             clog[id]?[k] = nil
         } else {

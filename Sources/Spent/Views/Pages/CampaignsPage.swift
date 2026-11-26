@@ -100,17 +100,18 @@ private struct CampaignCard: View {
                     let fut = k > t
                     let miss = !m && k < t
                     let auto = m && model.clog[c.id]?[k] == nil
+                    let locked = !fut && !Fmt.isEditable(k, today: t)
                     Button { model.toggleCampaign(c.id, k) } label: {
                         Text("\(i + 1)").font(.system(size: 11, weight: .semibold))
                             .frame(width: 30, height: 30)
                             .foregroundStyle(m ? Color.black.opacity(0.8) : miss ? skin.bad : skin.muted)
                             .background(m ? col : skin.panel2, in: Circle())
                             .overlay(Circle().stroke(k == t ? skin.ink : miss ? skin.bad.opacity(0.4) : skin.line, lineWidth: k == t ? 1.5 : 1))
-                            .opacity(fut ? 0.4 : 1)
+                            .opacity(fut ? 0.4 : locked ? 0.6 : 1)
                     }
                     .buttonStyle(.plain)
-                    .disabled(fut)
-                    .help("Day \(i + 1) · \(Fmt.weekdayName(k)) \(Fmt.shortDate(k))\(m ? (auto ? " · from habit" : " · done") : miss ? " · missed" : fut ? "" : " · today")")
+                    .disabled(fut || locked)
+                    .help("Day \(i + 1) · \(Fmt.weekdayName(k)) \(Fmt.shortDate(k))\(m ? (auto ? " · from habit" : " · done") : miss ? " · missed" : fut ? "" : " · today")\(locked ? " · locked" : "")")
                 }
             }
             HStack {

@@ -52,6 +52,14 @@ enum Fmt {
 
     static func addDays(key: String, _ n: Int) -> String { self.key(addDays(date(key), n)) }
 
+    /// How many days before today can still be logged or edited (today is always allowed).
+    static let editableDaysBack = 2
+
+    /// True when `key` is today or one of the previous `editableDaysBack` days. Older and future days are read-only.
+    static func isEditable(_ key: String, today: String = todayKey) -> Bool {
+        key <= today && key >= addDays(key: today, -editableDaysBack)
+    }
+
     /// "14:05"
     static func clock(_ epoch: Double) -> String {
         let c = calendar.dateComponents([.hour, .minute], from: Date(timeIntervalSince1970: epoch))

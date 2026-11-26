@@ -61,6 +61,7 @@ struct HabitCard: View {
                 HStack(spacing: 4) {
                     ForEach(Fmt.lastNKeys(7), id: \.self) { x in
                         let dd = model.isDone(h, x)
+                        let ed = Fmt.isEditable(x)
                         Button { model.toggleHabit(h.id, x) } label: {
                             Text(String(Fmt.weekdayName(x).prefix(1)))
                                 .font(.system(size: 11, weight: .semibold))
@@ -69,9 +70,11 @@ struct HabitCard: View {
                                 .background(dd ? c : skin.panel2, in: RoundedRectangle(cornerRadius: 6))
                                 .overlay(RoundedRectangle(cornerRadius: 6).stroke(x == k ? skin.ink.opacity(0.5) : .clear, lineWidth: 1))
                                 .opacity(!h.scheduled(x) && !dd ? 0.4 : 1)
+                                .opacity(ed ? 1 : 0.55)
                         }
                         .buttonStyle(.plain)
-                        .help("\(Fmt.shortDate(x))\(dd ? " · done" : "")")
+                        .disabled(!ed)
+                        .help("\(Fmt.shortDate(x))\(dd ? " · done" : "")\(ed ? "" : " · locked")")
                     }
                     Spacer()
                     Button(num ? "Log amount" : "Details") {
@@ -150,6 +153,7 @@ struct HabitEntrySheet: View {
         if let h = model.habit(target.habitID) {
             let k = target.key
             let existing = model.entry(h.id, k)
+            let editable = Fmt.isEditable(k)
             let c = Color(hex: h.color)
             VStack(alignment: .leading, spacing: 16) {
                 HStack(spacing: 12) {
@@ -159,6 +163,10 @@ struct HabitEntrySheet: View {
                         Text("\(Fmt.weekdayName(k)) \(Fmt.shortDate(k))\(k == Fmt.todayKey ? " · today" : "")").font(.system(size: 12)).foregroundStyle(skin.muted)
                     }
                 }
+                if !editable {
+                    Note("This day is locked. You can only log or change today and the last \(Fmt.editableDaysBack) days.")
+                }
+                Group {
                 if h.kind == .number {
                     Labeled(label: "How much?\(h.target > 0 ? " (target \(MenuBarContent.num(h.target)) \(h.unit))" : "")") {
                         TextField("0", text: $value).spentField().font(.system(size: 20))
@@ -170,13 +178,17 @@ struct HabitEntrySheet: View {
                 Labeled(label: "Note (optional)") {
                     TextField(h.kind == .number ? "e.g. easy pace, felt great" : "e.g. 30 min, park loop", text: $note).spentField()
                 }
+                }
+                .disabled(!editable)
                 HStack {
-                    Button("Save") { save(h, k) }.spentButton(.primary).keyboardShortcut(.defaultAction)
-                    if existing != nil {
+                    if editable {
+                        Button("Save") { save(h, k) }.spentButton(.primary).keyboardShortcut(.defaultAction)
+                    }
+                    if editable, existing != nil {
                         Button("Clear this day") { model.setEntry(h.id, k, nil); dismiss() }.spentButton(.ghost)
                     }
                     Spacer()
-                    Button("Cancel") { dismiss() }.spentButton(.ghost).keyboardShortcut(.cancelAction)
+                    Button(editable ? "Cancel" : "Close") { dismiss() }.spentButton(.ghost).keyboardShortcut(.cancelAction)
                 }
                 SectionLabel(text: "Last 30 days")
                 HStack(spacing: 4) {

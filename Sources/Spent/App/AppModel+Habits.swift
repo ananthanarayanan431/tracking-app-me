@@ -65,6 +65,7 @@ extension AppModel {
     }
 
     func setEntry(_ id: String, _ key: String, _ e: HabitEntry?) {
+        guard Fmt.isEditable(key) else { return lockedToast(key) }
         if let e {
             hlog[key, default: [:]][id] = e
         } else {
@@ -76,6 +77,7 @@ extension AppModel {
 
     func toggleHabit(_ id: String, _ key: String) {
         guard let h = habit(id) else { return }
+        guard Fmt.isEditable(key) else { return lockedToast(key) }
         if h.kind == .number {
             habitEntryTarget = HabitEntryTarget(habitID: id, key: key)
             return
@@ -87,6 +89,12 @@ extension AppModel {
             setEntry(id, key, HabitEntry(done: true, at: today ? Fmt.nowHM() : ""))
             toast("\(h.name): done\(today ? " at " + Fmt.nowHM() : "")")
         }
+    }
+
+    /// Days older than `Fmt.editableDaysBack` (and future days) can't be logged or changed.
+    func lockedToast(_ key: String) {
+        toast(key > Fmt.todayKey ? "You can't log a day that hasn't happened yet"
+              : "\(Fmt.shortDate(key)) is locked. You can only log today and the last \(Fmt.editableDaysBack) days")
     }
 
     @discardableResult
