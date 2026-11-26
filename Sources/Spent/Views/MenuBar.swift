@@ -1,3 +1,6 @@
+import AadatKit
+import DeskBreakCore
+import DeskBreakKit
 import SwiftUI
 
 /// Menu bar title: today's total, or the focus countdown while focusing.
@@ -61,6 +64,15 @@ struct MenuBarContent: View {
             Divider()
         }
 
+        if let db = model.companions.deskbreak {
+            DeskBreakMenuSection(controller: db)
+            Divider()
+        }
+        if let board = model.companions.aadat {
+            AadatMenuSection(controller: board)
+            Divider()
+        }
+
         let active = model.campaigns.filter { model.campaignStats($0).state == .active }
         ForEach(active) { c in
             let st = model.campaignStats(c)
@@ -90,5 +102,35 @@ struct MenuBarContent: View {
 
     static func num(_ v: Double) -> String {
         v == v.rounded() ? String(Int(v)) : String(format: "%.1f", v)
+    }
+}
+
+/// DeskBreak's countdowns and pause control in Spent's menu.
+private struct DeskBreakMenuSection: View {
+    @ObservedObject var controller: DeskBreakKit.AppController
+
+    var body: some View {
+        let w = controller.remaining(for: .water).regular, k = controller.remaining(for: .walk).regular
+        let t = controller.todaySummary()
+        Text("Water in \(DurationText.short(w)) · Walk in \(DurationText.short(k))\(controller.isPaused ? " (paused)" : "")")
+        Text("Today: water \(t.water.done)/\(t.water.fired) · walk \(t.walk.done)/\(t.walk.fired)")
+        if controller.isPaused {
+            Button("Resume reminders") { controller.resume() }
+        } else {
+            Button("Pause reminders for 1 hour") { controller.pause() }
+        }
+    }
+}
+
+/// Today's Aadat tasks as tick-boxes in Spent's menu.
+private struct AadatMenuSection: View {
+    @ObservedObject var controller: AadatKit.BoardController
+
+    var body: some View {
+        let b = controller.board
+        Text("Tasks today: \(b.doneCount)/\(b.totalCount)")
+        ForEach(b.today) { item in
+            Toggle(item.title, isOn: Binding(get: { item.isDone }, set: { _ in controller.toggleDone(item) }))
+        }
     }
 }
