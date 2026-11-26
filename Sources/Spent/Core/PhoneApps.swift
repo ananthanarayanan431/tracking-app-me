@@ -34,7 +34,7 @@ enum PhoneApps {
         "ph.telegra.Telegraph": "Telegram", "org.whispersystems.signal": "Signal", "com.hammerandchisel.discord": "Discord",
         "com.tinyspeck.chatlyio": "Slack", "com.microsoft.skype.teams": "Teams", "us.zoom.videomeetings": "Zoom",
         "com.spotify.client": "Spotify", "com.netflix.Netflix": "Netflix", "com.amazon.aiv.AIVApp": "Prime Video",
-        "in.startv.hotstar": "Hotstar", "com.amazon.Amazon": "Amazon", "in.amazon.mShop.android.shopping": "Amazon",
+        "in.startv.hotstar": "Hotstar", "com.amazon.Amazon": "Amazon", "com.amazon.AmazonIN": "Amazon", "in.amazon.mShop.android.shopping": "Amazon",
         "com.appflipkart.flipkart": "Flipkart", "in.swiggy.ios": "Swiggy", "com.zomato.zomato": "Zomato",
         "com.grofers.consumer": "Blinkit", "com.openai.chat": "ChatGPT", "com.anthropic.claude": "Claude",
         "ai.perplexity.app": "Perplexity", "notion.id": "Notion", "com.ubercab.UberClient": "Uber",
@@ -80,7 +80,7 @@ enum PhoneApps {
     /// "Gmail - Email by Google" → "Gmail"; "INDmoney: US Stocks, …" → "INDmoney"
     static func clean(_ storeName: String) -> String {
         var n = storeName
-        for sep in [" - ", " – ", " — ", ": ", " | "] {
+        for sep in [" - ", " – ", " — ", ": ", " | ", ", "] {
             if let r = n.range(of: sep) { n = String(n[..<r.lowerBound]) }
         }
         n = n.trimmingCharacters(in: .whitespaces)

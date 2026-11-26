@@ -6,6 +6,7 @@ struct PhoneAppsTests {
         #expect(PhoneApps.clean("Gmail - Email by Google") == "Gmail")
         #expect(PhoneApps.clean("INDmoney: US Stocks, Mutual Funds") == "INDmoney")
         #expect(PhoneApps.clean("WhatsApp Messenger") == "WhatsApp Messenger")
+        #expect(PhoneApps.clean("Shop Fast, Pay Easy") == "Shop Fast")
     }
 
     @Test func builtinsAndGuesses() {
