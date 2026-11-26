@@ -15,12 +15,13 @@ cp "$BIN" "$APP/Contents/MacOS/Spent"
 cp Resources/Info.plist "$APP/Contents/Info.plist"
 # Icons8 UI icons (template PNGs at 1x/2x/3x), see icons8.json
 cp -R Resources/Icons "$APP/Contents/Resources/Icons"
+cp Resources/AppIconGlyph.png "$APP/Contents/Resources/AppIconGlyph.png"
 
 # App icon: rendered from code, converted to .icns
 if [ -x "$(command -v iconutil)" ]; then
   ICONSET="build/AppIcon.iconset"
   rm -rf "$ICONSET"; mkdir -p "$ICONSET"
-  swift scripts/make-icon.swift "$ICONSET" >/dev/null
+  swift scripts/make-icon.swift "$ICONSET" Resources/AppIconGlyph.png >/dev/null
   iconutil -c icns "$ICONSET" -o "$APP/Contents/Resources/AppIcon.icns"
 fi
 

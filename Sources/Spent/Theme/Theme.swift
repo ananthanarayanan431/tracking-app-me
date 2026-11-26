@@ -133,16 +133,17 @@ enum Theme {
             accent.setFill()
             bg.fill()
             NSGradient(starting: NSColor.white.withAlphaComponent(0.22), ending: NSColor.black.withAlphaComponent(0.18))?.draw(in: bg, angle: -90)
-            on.setStroke()
-            let ring = NSBezierPath(ovalIn: NSRect(x: 132 * s, y: 132 * s, width: 248 * s, height: 248 * s))
-            ring.lineWidth = 34 * s
-            ring.stroke()
-            let hands = NSBezierPath()
-            hands.move(to: NSPoint(x: 256 * s, y: 256 * s)); hands.line(to: NSPoint(x: 256 * s, y: 336 * s))
-            hands.move(to: NSPoint(x: 256 * s, y: 256 * s)); hands.line(to: NSPoint(x: 310 * s, y: 222 * s))
-            hands.lineWidth = 34 * s
-            hands.lineCapStyle = .round
-            hands.stroke()
+            // Icons8 "clock" glyph (white), tinted to the theme's on-accent colour.
+            if let url = Bundle.main.url(forResource: "AppIconGlyph", withExtension: "png"),
+               let glyph = NSImage(contentsOf: url) {
+                let tinted = NSImage(size: glyph.size, flipped: false) { r in
+                    glyph.draw(in: r)
+                    on.set()
+                    r.fill(using: .sourceAtop)
+                    return true
+                }
+                tinted.draw(in: NSRect(x: 116 * s, y: 116 * s, width: 280 * s, height: 280 * s))
+            }
             return true
         }
     }

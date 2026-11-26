@@ -2,6 +2,7 @@
 import AppKit
 
 let out = CommandLine.arguments[1]
+let glyphPath = CommandLine.arguments.count > 2 ? CommandLine.arguments[2] : "Resources/AppIconGlyph.png"
 let accent = NSColor(srgbRed: 1.0, green: 0.416, blue: 0.333, alpha: 1)
 
 func render(_ px: Int) -> Data {
@@ -16,13 +17,10 @@ func render(_ px: Int) -> Data {
     accent.setFill(); bg.fill()
     NSGradient(starting: NSColor.white.withAlphaComponent(0.22), ending: NSColor.black.withAlphaComponent(0.18))!
         .draw(in: bg, angle: -90)
-    NSColor.white.setStroke()
-    let ring = NSBezierPath(ovalIn: NSRect(x: 132 * s, y: 132 * s, width: 248 * s, height: 248 * s))
-    ring.lineWidth = 34 * s; ring.stroke()
-    let hands = NSBezierPath()
-    hands.move(to: NSPoint(x: 256 * s, y: 256 * s)); hands.line(to: NSPoint(x: 256 * s, y: 336 * s))
-    hands.move(to: NSPoint(x: 256 * s, y: 256 * s)); hands.line(to: NSPoint(x: 310 * s, y: 222 * s))
-    hands.lineWidth = 34 * s; hands.lineCapStyle = .round; hands.stroke()
+    // Icons8 "clock" (ios7, id 34), white, see icons8.json
+    if let glyph = NSImage(contentsOfFile: glyphPath) {
+        glyph.draw(in: NSRect(x: 116 * s, y: 116 * s, width: 280 * s, height: 280 * s))
+    }
     NSGraphicsContext.restoreGraphicsState()
     return rep.representation(using: .png, properties: [:])!
 }

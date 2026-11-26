@@ -513,6 +513,8 @@ private struct DataCard: View {
                 Button("Retry logos") { IconProvider.shared.retry(); model.toast("Fetching missing logos…") }.spentButton()
             }
             Note("\(model.daysAvail.count) days of Mac history on disk. \(IconProvider.shared.loadedCount) logos loaded.")
+            Link("Icons by Icons8", destination: URL(string: "https://icons8.com")!)
+                .font(.system(size: 12))
         }
     }
 }
