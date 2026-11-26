@@ -17,6 +17,9 @@ final class AppModel {
     var detail: DetailTarget?
     var habitEntryTarget: HabitEntryTarget?
     var awayPrompt: Gap?
+    var campaignFormOpen = false
+    var editingCampaign: String?
+    var editingHabit: String?
     var toastText: String?
 
     // Persisted state

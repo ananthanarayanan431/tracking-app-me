@@ -64,10 +64,7 @@ extension AppModel {
         guard now - g.e <= 15 * 60, !awayPrompted.contains(g.s) else { return }
         awayPrompted.insert(g.s)
         notify("Welcome back. You were away \(Fmt.duration(g.e - g.s)) (\(Fmt.clock(g.s))–\(Fmt.clock(g.e))). What were you doing?")
-        if settings.awayPop != false {
-            NSApp.activate(ignoringOtherApps: true)
-            for w in NSApp.windows where w.canBecomeMain { w.makeKeyAndOrderFront(nil) }
-        }
+        if settings.awayPop != false { MainWindow.show() }
         awayPrompt = g
     }
 
